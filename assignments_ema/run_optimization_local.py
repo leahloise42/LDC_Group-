@@ -312,6 +312,8 @@ def run_seed(
     epsilons                     = cfg["epsilons"]
     temp_year_of_interest        = cfg["temperature_year_of_interest"]
     reference_scenario_idx       = cfg["reference_ssp_rcp_scenario_index"]
+    welfare_name                 = cfg.get("welfare_function", "UTILITARIAN").upper()
+    welfare_enum                 = WelfareFunction[welfare_name]
 
     # -- derived quantities ------------------------------------------------
     data_loader   = DataLoader()
@@ -351,7 +353,7 @@ def run_seed(
         Constant("n_inputs_rbf",                     n_inputs),
         Constant("n_outputs_rbf",                    n_regions),
         Constant("social_welfare_function_type",
-                 WelfareFunction.UTILITARIAN.value[0]),   # 0
+                 welfare_enum.value[0]),
         Constant("economy_type",         Economy.NEOCLASSICAL.value),   # 0
         Constant("damage_function_type", DamageFunction.KALKUHL.value), # 1
         Constant("abatement_type",       Abatement.ENERDATA.value),     # 0
@@ -388,9 +390,9 @@ def run_seed(
     ]
 
     # -- output setup ------------------------------------------------------
-    seed_dir = os.path.join(output_dir, f"UTILITARIAN_{nfe}_{seed}")
+    seed_dir = os.path.join(output_dir, f"{welfare_name}_{nfe}_{seed}")
     os.makedirs(seed_dir, exist_ok=True)
-    archive_filename = f"UTILITARIAN_{nfe}_{seed}.tar.gz"
+    archive_filename = f"{welfare_name}_{nfe}_{seed}.tar.gz"
 
     # ema_workbench 3.0 raises FileExistsError if archive already exists.
     archive_path = os.path.join(seed_dir, archive_filename)
@@ -488,7 +490,10 @@ def main() -> None:
     print("=" * 65)
     print("JUSTICE — Local MOEA Optimisation  (Assignment 5)")
     print("=" * 65)
-    print(f"  Welfare function  : UTILITARIAN")
+    with open(args.config) as _fh:
+        _cfg_preview = json.load(_fh)
+    _wf_preview = _cfg_preview.get("welfare_function", "UTILITARIAN").upper()
+    print(f"  Welfare function  : {_wf_preview}")
     print(f"  Config            : {args.config}")
     print(f"  NFE per seed      : {args.nfe:,}")
     print(f"  Seeds ({len(args.seeds)})        : {args.seeds}")

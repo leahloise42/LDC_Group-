@@ -13,5 +13,6 @@
         1000
     ],
     "temperature_year_of_interest": 2200,
-    "reference_ssp_rcp_scenario_index": 2
+    "reference_ssp_rcp_scenario_index": 2,
+    "welfare_function": "SUFFICIENTARIAN"
 }
